@@ -16,6 +16,9 @@ Doge Launch will have the following functionality
 ## Wireframe
 The application will consist of a single page with the game, displaying the lives, current level, mute button, restart/reset/pause buttons, and links to my Github and LinkedIn pages.  
 
+![wire-frame](dist/images/wireframe.png)
+
+
 ## Architecture and Technologies
 This project will be implemented with the following technologies:
 
@@ -29,7 +32,7 @@ In this application there will be 4 scripts:
 
 ``board.js``: This file handles the logic for animating and updating the DOM elements.
 
-```gravity.js```: this script will house the logic for the 'black holes' that affect the doge ball as well as the audio.
+```blackhole.js```: this script will house the logic for the 'black holes' that affect the doge ball as well as the audio.
 
 ```dogeball.js```: this script will house the movement and sounds for the doge ball.
 
@@ -39,4 +42,24 @@ In this application there will be 4 scripts:
 
 **Over the weekend**
 - [ ] Research gravity and attraction and possible libraries I may need to use.
-- [ ] Setup the 
+- [ ] Setup the backbone and required mathmatical function (distance, gravity, velocity)
+- [ ] Setup webpack, dist folder, canvas.
+
+**Day 1**: Ensure webpack is setup correctly, that the page is displaying, and start coding logic for the game.  Goals:
+- [ ] Create methods that will allow users to control the velocity of the dogeball.
+- [ ] start exploring attraction and gravity and their affects on the dogeball.
+
+**Day 2** Spend this day focusing on getting the gravitation pull(attraction) and rotational forces down so that the dogeball can rotate and be affected by the black holes correctly. Build out the blackhole.js file and connect it to our board.js
+- [ ] Complete dogeball.js
+- [ ] Start testing and coding blackhole.js.
+
+**Day 3**: Spend this day working on the bumpers and 'home/goal' logic.  
+- [ ] Code out the win condition for the game in board.js.
+- [ ] Start working on bumper.js(constructor, update functions, colors, sounds)
+- [ ] Get colors and sound for bumpers and black holes. 
+
+**Day 4** Style the frontend, add background, add levels.
+- [ ] Style the canvas, add background and links
+- [ ] make sure the play, restart, pause buttons are working.
+- [ ] Add additional levels to the game.
+
