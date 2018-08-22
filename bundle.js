@@ -86,6 +86,52 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./lib/blackhole.js":
+/*!**************************!*\
+  !*** ./lib/blackhole.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+const colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']
+
+class Blackhole {
+  constructor(ctx, x, y, mass, radius, gravity){
+    this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.gravity = radius;
+    this.mass = mass;
+    this.range = radius * 1.5;
+    this.draw();
+    this.applyGravity = this.applyGravity.bind(this);
+  }
+
+  draw(){
+    const img = new Image();
+    img.src ='./assets/images/blackhole.png';
+    this.ctx.drawImage(img, this.x-this.radius/2, this.y-this.radius/2, this.radius*2, this.radius*2);
+  }
+
+  applyGravity(doge, distance){
+    const force = this.gravity*(this.mass)/(Math.pow(distance, 2));
+    const dx = (this.x - doge.x)/100 * force;
+    const dy = (this.y - doge.y)/100 * force;
+    doge.dy -= dy;
+    doge.dx -= dx;
+  }
+
+
+
+
+}
+
+
+module.exports = Blackhole;
+
+/***/ }),
+
 /***/ "./lib/board.js":
 /*!**********************!*\
   !*** ./lib/board.js ***!
@@ -143,7 +189,7 @@ class Dogeball {
     this.clicked = false;
     this.lineX = 0;
     this.lineY = 0;
-    this.x = 0;
+    this.x = 15;
     this.y = 700;
     this.dy = 0;
     this.dx = 0;
@@ -202,12 +248,13 @@ module.exports = Dogeball;
 /***/ (function(module, exports, __webpack_require__) {
 
 const Util = __webpack_require__(/*! ./util */ "./lib/util.js");
+const Blackhole = __webpack_require__(/*! ./blackhole */ "./lib/blackhole.js");
 
 class Game {
   constructor(doge, ctx){
     this.doge = doge;
     this.ctx = ctx;
-    this.blackholes = [];
+    this.blackholes = [new Blackhole(ctx, 500, 500, 100, 75, 25)];
     this.bumpers = [];
     this.target = [];
     this.animate = this.animate.bind(this);
@@ -219,6 +266,7 @@ class Game {
   animate(){
     console.log(this.doge.lineX, this.doge.lineY);
     this.ctx.clearRect(0,0, 1000, 800);
+    this.blackholes.forEach(blackhole => blackhole.draw());
     this.checkAttraction();
     this.updateDoge();
     window.requestAnimationFrame(this.animate);
@@ -258,6 +306,7 @@ const Util = {
  randomColor(colors){
     return colors[Math.floor(Math.random() * colors.length)]
   },
+
  distance(x1, y1, x2, y2) {
     const xDist = x2 - x1
     const yDist = y2 - y1
@@ -268,15 +317,14 @@ const Util = {
   angle(x2, y2, x1, y1) {
     const dy = y1 - y2;
     const dx = x1 - x2;
-    let theta = Math.atan2(dy, dx); // range (-PI, PI]
-    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-    //if (theta < 0) theta = 360 + theta; // range [0, 360)
+    let theta = Math.atan2(dy, dx);
+    theta *= 180 / Math.PI; 
     return theta;
   },
 
   angle360(start, end) {
-    var theta = this.angle(start[0], start[1], end[0], end[1]); // range (-180, 180]
-    if (theta < 0) theta = 360 + theta; // range [0, 360)
+    var theta = this.angle(start[0], start[1], end[0], end[1]);
+    if (theta < 0) theta = 360 + theta;
     return theta;
   }
 }
