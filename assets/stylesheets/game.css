@@ -1,3 +1,8 @@
 #board {
   background-image: url('../images/background.jpg');
 }
+
+header {
+  display: flex;
+  flex-direction: column;
+}

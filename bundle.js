@@ -103,7 +103,7 @@ class Blackhole {
     this.radius = radius;
     this.gravity = radius;
     this.mass = mass;
-    this.range = radius * 1.5;
+    this.range = radius * 1.6;
     this.draw();
     this.applyGravity = this.applyGravity.bind(this);
   }
@@ -112,6 +112,11 @@ class Blackhole {
     const img = new Image();
     img.src ='./assets/images/blackhole.png';
     this.ctx.drawImage(img, this.x-this.radius/2, this.y-this.radius/2, this.radius*2, this.radius*2);
+    // this.ctx.beginPath();
+    // this.ctx.arc(this.x + this.radius/2, this.y + this.radius/2, this.radius, 0, Math.PI*2);
+    // this.ctx.strokeStyle = '#FFF';
+    // this.ctx.stroke();
+    // this.ctx.closePath();
   }
 
   applyGravity(doge, distance){
@@ -201,12 +206,18 @@ class Dogeball {
      
   }
 
-  draw(){
+  win(){
+    this.dy = 0;
+    this.dx = 0;
+    this.draw('blackhole');
+  }
+
+  draw(link = 'dogeball'){
     if(this.clicked){
       this.drawLine();
     }
     const img = new Image();
-    img.src ='./assets/images/dogeball.png';
+    img.src =`./assets/images/${link}.png`;
     this.ctx.drawImage(img, this.x, this.y, 75, 75);
 
   }
@@ -249,32 +260,53 @@ module.exports = Dogeball;
 
 const Util = __webpack_require__(/*! ./util */ "./lib/util.js");
 const Blackhole = __webpack_require__(/*! ./blackhole */ "./lib/blackhole.js");
+const Target = __webpack_require__(/*! ./target */ "./lib/target.js");
 
 class Game {
   constructor(doge, ctx){
+    this.level = 0;
     this.doge = doge;
     this.ctx = ctx;
-    this.blackholes = [new Blackhole(ctx, 500, 500, 100, 75, 25)];
+    this.win = false;
+    this.blackholes = [
+      new Blackhole(ctx, 400, 500, 100, 75, 15),
+      new Blackhole(ctx, 100, 220, 70, 35, 8),
+      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 750, 600, 150, 100, 40),
+      new Blackhole(ctx, 450, 150, 50, 25, 6)
+    ];
     this.bumpers = [];
-    this.target = [];
+    this.target = new Target(ctx, 950, 0, 50);
     this.animate = this.animate.bind(this);
     this.checkAttraction = this.checkAttraction.bind(this);
     this.updateDoge = this.updateDoge.bind(this);
+    this.checkWin = this.checkWin.bind(this);
     window.requestAnimationFrame(this.animate);
   }
 
   animate(){
     console.log(this.doge.lineX, this.doge.lineY);
     this.ctx.clearRect(0,0, 1000, 800);
+    this.target.draw();
     this.blackholes.forEach(blackhole => blackhole.draw());
-    this.checkAttraction();
+    this.checkWin();
     this.updateDoge();
+    this.checkAttraction();
     window.requestAnimationFrame(this.animate);
   }
 
   updateDoge(){
     this.doge.updatePos();
     this.doge.draw();
+  }
+
+  checkWin(){
+    const distance = Util.distance(this.doge.x, this.doge.y, this.target.x, this.target.y);
+    if (distance < this.target.size && !this.win){
+      this.win = true;
+      this.doge.win();
+      alert("win!");
+    }
   }
 
   checkAttraction(){
@@ -288,6 +320,34 @@ class Game {
 }
 
 module.exports = Game;
+
+/***/ }),
+
+/***/ "./lib/target.js":
+/*!***********************!*\
+  !*** ./lib/target.js ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+class Target{
+  constructor(ctx, x, y, size){
+    this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.size = size;
+  }
+
+  draw(){
+  const img = new Image();
+  img.src ='./assets/images/goal.png';
+  this.ctx.drawImage(img, this.x - this.size/2, this.y + this.size/2, this.size, this.size);
+  }
+
+
+}
+
+module.exports = Target;
 
 /***/ }),
 
