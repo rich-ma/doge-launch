@@ -16,7 +16,7 @@ Doge Launch will have the following functionality
 ## Wireframe
 The application will consist of a single page with the game, displaying the lives, current level, mute button, restart/reset/pause buttons, and links to my Github and LinkedIn pages.  
 
-![wire-frame](images/wireframe.png)
+![wire-frame](assets/images/wireframe.png)
 
 
 ## Architecture and Technologies

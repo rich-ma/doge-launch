@@ -4,7 +4,7 @@
   "description": "## Background and overview Doge Launch is an interactive game that utilizes velocity, acceleration, gravity, and rotational forces in a reimagined golf experience.",
   "main": "webpack.config.js",
   "scripts": {
-    "start": "webpack --config webpack.config.js --mode=development",
+    "start": "webpack --watch --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
