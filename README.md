@@ -54,12 +54,12 @@ In this application there will be 4 scripts:
 - [x] Start testing and coding blackhole.js.
 
 **Day 3**: Spend this day working on the bumpers and 'home/goal' logic.  
-- [ ] Code out the win condition for the game in board.js.
+- [x] Code out the win condition for the game in board.js.
 - [ ] Start working on bumper.js(constructor, update functions, colors, sounds)
 - [ ] Get colors and sound for bumpers and black holes. 
 
 **Day 4** Style the frontend, add background, add levels.
-- [ ] Style the canvas, add background and links
+- [x] Style the canvas, add background and links
 - [ ] make sure the play, restart, pause buttons are working.
 - [ ] Add additional levels to the game.
 

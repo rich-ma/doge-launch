@@ -1,8 +1,49 @@
 #board {
   background-image: url('../images/background.jpg');
+  width: 1000px;
+  height: 800px;
+  align-self: center;
+
+}
+header{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  justify-content: space-between;
+  background-color: black;
+  
+}
+header > div {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: #fff;
+  font-size: 24px;
 }
 
-header {
+body {
   display: flex;
   flex-direction: column;
+  background-color: #23272A;
+  align-items: center;
 }
+
+ul{
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  font-size: 40px;
+  align-items: flex-end;
+  -webkit-padding-start: 0px;
+  padding-top: 11px;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.fab{
+  color: #fff;
+  margin-right: 10px;
+}
+

@@ -146,6 +146,7 @@ module.exports = Blackhole;
 
 const Game = __webpack_require__(/*! ./game.js */ "./lib/game.js");
 const Doge = __webpack_require__(/*! ./dogeball.js */ "./lib/dogeball.js");
+const Util = __webpack_require__(/*! ./util.js */ "./lib/util.js");
 document.addEventListener("DOMContentLoaded", () => {
 
     const canvas = document.querySelector('canvas');
@@ -155,12 +156,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const doge = new Doge(ctx);
 
     addEventListener('mousedown', event => {
-        doge.clicked = true;
+        const distance = Util.distance(event.offsetX, event.offsetY, doge.x, doge.y + 50);
+        if (distance < 100) {
+            doge.clicked = true;
+        }
     });
     addEventListener('mousemove', event => {
         if(doge.clicked){
-            doge.lineX = event.pageX;
-            doge.lineY = event.pageY;
+            debugger
+            doge.lineX = event.offsetX;
+            doge.lineY = event.offsetY;
         }
     });
     addEventListener('mouseup', event => {
