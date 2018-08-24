@@ -18,6 +18,51 @@
 
 </head>
 <body>
+  <!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="help">
+      <h3>Welcome to Doge Launch!</h3>
+      <div>
+        <ul class='help-ul'>
+          <li>
+            <img class='help-img'
+            src="./assets/images/dogedayumSmall.png" alt="">
+            <p>Click and drag on me to choose how far to shoot</p>
+          </li>
+            <img class='help-img' 
+            src="./assets/images/blackhole.png" alt="">
+            <p>Getting close to these will change your angle</p>
+          <li>
+          </li>
+            <img class='help-img' 
+            src="./assets/images/asteroid.png" alt="">
+            <p>Hitting these will bounce you back</p>
+          <li>
+          </li>
+            <img class='help-img'  
+            src="./assets/images/goal.png" alt="">
+            <p>goal!</p>
+          <li>
+        </ul>
+      </div>
+    </div>
+    <div id='win'>
+      <h3>Wow such win!</h3>
+      <img class='help-img' src="./assets/images/dogepartySmall.png" alt="">
+      <p>You have <span id='death-count' value=''></span>.</p>
+    </div>
+    <div id='died'>
+      <h3>You died!</h3>
+      <img class='help-img' src="./assets/images/dogeplsSmall.png" alt="">
+      <p>You have <span id='death-count2' value=''></span>.</p>
+    </div>
+  </div>
+
+</div>
 <header>
   <div>
     <i class="fas fa-paw"></i>
@@ -41,10 +86,16 @@
     <i id='retry' class="fas fa-undo"></i>
     <i id='restart' class="fas fa-fast-backward"></i>
   </ul>
-  <i id='help' class="far fa-question-circle"></i>
+  <i id='help-button' class="far fa-question-circle"></i>
 </div>
+<div>
+  <div class='info-sidebar'>
 
-    <canvas id='board'></canvas>
+
+  </div>
+  <canvas id='board'></canvas>
+  <div></div>
+</div>
     <script type="text/javascript" src="./bundle.js"></script>
 </body>
 </html>

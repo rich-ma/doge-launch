@@ -142,7 +142,7 @@ class Blackhole {
     this.mass = mass;
     this.range = radius * 1.6;
     this.draw();
-    this.applyGravity = this.applyGravity.bind(this);
+    this.calculateGravity = this.calculateGravity.bind(this);
   }
 
   draw(){
@@ -156,7 +156,7 @@ class Blackhole {
     // this.ctx.closePath();
   }
 
-  applyGravity(doge, distance){
+  calculateGravity(doge, distance){
     const force = this.gravity*(this.mass)/(Math.pow(distance, 2));
     const dx = (this.x - doge.x)/100 * force;
     const dy = (this.y - doge.y)/100 * force;
@@ -189,12 +189,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.querySelector('canvas');
     const restart = document.getElementById('restart');
     const retry = document.getElementById('retry');
+    const modal = document.getElementById('myModal');
+    const helpButton = document.getElementById('help-button');
+    const span = document.getElementsByClassName("close")[0];
+    const help = document.getElementById("help");
+    const win = document.getElementById("win");
+    const died = document.getElementById("died");
+
+
+    help.style.display = 'block';
+    modal.style.display = "block";
+
     canvas.width = 1000;
     canvas.height = 800;
     const ctx = canvas.getContext("2d");
     const doge = new Doge(ctx);
+
+
     
     addEventListener('mousedown', event => {
+        if (doge.x !== 15 || doge.y !== 700) return null;
+        if (modal.style.display === "block") return null;
         const distance = Util.distance(event.offsetX, event.offsetY, doge.x, doge.y + 50);
         if (distance < 100) {
             doge.clicked = true;
@@ -207,6 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     addEventListener('mouseup', event => {
+        if (doge.x !== 15 || doge.y !== 700) return null;
+        if (modal.style.display === "block") return null;
+        if (doge.clicked === false) return null;
         doge.clicked = false; 
         if(doge.lineX && doge.lineY) doge.shoot();            
     });
@@ -217,9 +235,32 @@ document.addEventListener("DOMContentLoaded", () => {
         game.retry();
     });
 
+    helpButton.addEventListener('click', () => {
+        help.style.display = 'block';
+        modal.style.display = "block";
+    });
+
     restart.addEventListener('click', () => {
         game.restart();
     });
+
+    span.onclick = function () {
+        modal.style.display = "none";
+        help.style.display = 'none';
+        win.style.display = 'none';
+        died.style.display = 'none';
+        
+    }
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+            help.style.display = 'none';
+            win.style.display = 'none';
+            died.style.display = 'none';
+
+        }
+    }
 });
 
 const colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']
@@ -252,23 +293,32 @@ class Dogeball {
     this.vel = null;
     this.acc = null;
     this.dir = null;
+    this.win = false;
+    this.winImg = new Image();
+    this.winImg.src = `./assets/images/dogepartySmall.png`;
+    this.gravityImg = new Image();
+    this.gravityImg.src = `./assets/images/dogeplsSmall.png`;
+    this.img = new Image();
+    this.img.src = `./assets/images/dogedayumSmall.png`;
 
     this.shoot = this.shoot.bind(this);
     this.reset = this.reset.bind(this);
+    this.draw = this.draw.bind(this);
   }
 
-  win(){
-    this.dy = 0;
-    this.dx = 0;
-    this.draw('blackhole');
-  }
 
-  draw(link = 'dogeball'){
+  draw(win, gravity){
     if(this.clicked){
       this.drawLine();
     }
-    const img = new Image();
-    img.src =`./assets/images/${link}.png`;
+    let img;
+    if(win){
+     img = this.winImg;
+    } else if(gravity){
+      img = this.gravityImg;
+    } else {
+      img = this.img;
+    }
     this.ctx.drawImage(img, this.x, this.y, 75, 75);
 
   }
@@ -285,13 +335,12 @@ class Dogeball {
   updatePos(){
     this.y -= this.dy;
     this.x -= this.dx;
-    console.log(this.x, this.y);
    }
 
   shoot(){
-    this.velocity = Util.distance(50, 750, this.lineX, this.lineY);
-    this.dy = (750 - this.lineY)/100;
-    this.dx = (50 - this.lineX)/100;
+    this.vel = Util.distance(50, 750, this.lineX, this.lineY);
+    this.dy = (750 - this.lineY)/80;
+    this.dx = (50 - this.lineX)/80;
     this.angle = Util.angle360([50, 750], [this.lineX, this.lineY]);
   }
 
@@ -300,6 +349,10 @@ class Dogeball {
     this.y = 700;
     this.dy = 0;
     this.dx = 0;
+    this.vel = 0;
+    this.angle = 0;
+    this.dir = null;
+    this.acc = 0;
   }
 
 
@@ -324,11 +377,13 @@ const Target = __webpack_require__(/*! ./target */ "./lib/target.js");
 
 class Game {
   constructor(doge, ctx){
+    this.clicked = false;
     this.level = 0;
     this.deaths = 0;
     this.doge = doge;
     this.ctx = ctx;
     this.win = false;
+    this.gravity = false;
     this.lose = false;
     this.blackholes = null;
     this.target = null;
@@ -340,18 +395,25 @@ class Game {
     this.checkWin = this.checkWin.bind(this);
     this.checkLose = this.checkLose.bind(this);
     this.restart = this.restart.bind(this);
+    this.winAlert = this.winAlert.bind(this);
+    this.drawComponents = this.drawComponents.bind(this);
     this.retry = this.retry.bind(this);
     this.level1 = this.level1.bind(this);
     window.requestAnimationFrame(this.animate);
   }
 
   checkLose(){
+    const modal = document.getElementById('myModal');
+    const deathModal = document.getElementById("died");
+    const deathCount = document.getElementById("death-count2");
     if (this.lose === true) return null;
     if(this.doge.x > 1050 || this.doge.y > 850 || this.doge.x < -100 || this.doge.y < -200) {
       this.deaths += 1;
       this.lose = true;
-      alert('you lost');
-      this.doge.reset();
+      deathCount.innerText = `${this.deaths} ${this.deaths===1 ? 'death' : 'deaths'}`;
+      deathModal.style.display = 'block';
+      modal.style.display = 'block';
+      this.retry();
     };
   }
 
@@ -359,40 +421,67 @@ class Game {
     this.level = 0;
     this.deaths = 0;
     this.lose = false;
+    this.clicked = false;
     this.doge.reset();
   }
 
   retry(){
+    this.clicked = false;
     this.lose = false;
     this.doge.reset();
   }
 
   animate(){
+    this.gravity = false;
     if(this.level <= 5) this.changeLevel(this.ctx);
     this.ctx.clearRect(0,0, 1000, 800);
-    this.target.draw();
-    this.blackholes.forEach(blackhole => blackhole.draw());
-    this.asteroids.forEach(asteroid => asteroid.draw());
+    this.drawComponents();
     this.checkWin();
-    this.updateDoge();
     this.checkAttraction();
     this.checkCollision();
-    window.requestAnimationFrame(this.animate);
     this.checkLose();
+    this.updateDoge(this.win, this.gravity);
+    this.frame = window.requestAnimationFrame(this.animate);
+    this.winAlert();
   }
 
   updateDoge(){
     this.doge.updatePos();
-    this.doge.draw();
+    this.doge.draw(this.win, this.gravity);
+  }
+
+  drawComponents(){
+    this.target.draw();
+    this.blackholes.forEach(blackhole => blackhole.draw());
+    this.asteroids.forEach(asteroid => asteroid.draw());
   }
 
   checkWin(){
     const distance = Util.distance(this.doge.x, this.doge.y, this.target.x-this.target.size/2, this.target.y-this.target.size/2);
     if (distance < this.target.size){
-      this.doge.win(); 
-      alert(`Wow such win! Click to go to level ${this.level + 1}!\n\nYou have died ${this.deaths} ${this.deaths === 1 ? 'time' : 'times'}.`);
-      this.doge.reset();
-      this.level += 1;
+      this.win = true; 
+      this.doge.win = true; 
+
+      // this.doge.draw(this.win, this.gravity);
+    }
+  }
+
+  winAlert(){
+    const modal = document.getElementById('myModal');
+    const winModal = document.getElementById("win");
+    const deathCount = document.getElementById("death-count");
+    if(this.win){
+    this.ctx.clearRect(0, 0, 1000, 800);
+    this.updateDoge(this.win, this.gravity);
+    this.drawComponents();
+    cancelAnimationFrame(this.frame);
+    deathCount.innerText = `${this.deaths} ${this.deaths===1 ? 'death' : 'deaths'}`;
+    winModal.style.display = 'block';
+    modal.style.display = 'block';
+    this.doge.reset();
+    this.level += 1;
+    this.win = false;
+    window.requestAnimationFrame(this.animate);
     }
   }
 
@@ -400,7 +489,8 @@ class Game {
     this.blackholes.forEach(blackhole => {
       const distance = Util.distance(this.doge.x, this.doge.y, blackhole.x, blackhole.y);
       if (blackhole.range >= distance){
-        blackhole.applyGravity(this.doge, distance);
+        blackhole.calculateGravity(this.doge, distance);
+        this.gravity = true;
       }
     })
   }
