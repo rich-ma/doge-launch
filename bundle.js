@@ -105,7 +105,7 @@ class Asteroid {
 
   draw() {
     const img = new Image();
-    if (this.radius < 10){
+    if (this.radius < 40){
       img.src = './assets/images/asteroid-small.png';
     } else {
       img.src = './assets/images/asteroid.png';
@@ -339,8 +339,8 @@ class Dogeball {
 
   shoot(){
     this.vel = Util.distance(50, 750, this.lineX, this.lineY);
-    this.dy = (750 - this.lineY)/80;
-    this.dx = (50 - this.lineX)/80;
+    this.dy = (750 - this.lineY)/60;
+    this.dx = (50 - this.lineX)/60;
     this.angle = Util.angle360([50, 750], [this.lineX, this.lineY]);
   }
 
@@ -497,7 +497,7 @@ class Game {
 
   checkCollision(){
     this.asteroids.forEach(asteroid => {
-      const distance = Util.distance(this.doge.x, this.doge.y, asteroid.x, asteroid.y);
+      const distance = Util.distance(this.doge.x, this.doge.y, asteroid.x + asteroid.radius / 2, asteroid.y + asteroid.radius / 2);
       if (distance <= asteroid.radius){
         asteroid.collision(this.doge);
       }
@@ -513,7 +513,7 @@ class Game {
     if (this.level === 5) this.level5(ctx);
   }
 
-  level0(ctx){
+  level5(ctx){
     this.blackholes = [];
     this.asteroids = [
     ];
@@ -529,44 +529,49 @@ class Game {
 
   level2(ctx) {
     this.blackholes = [
-      new Blackhole(ctx, 400, 500, 100, 75, 15),
-      new Blackhole(ctx, 100, 220, 70, 35, 8),
-      new Blackhole(ctx, 700, 300, 75, 60, 15),
-      new Blackhole(ctx, 750, 600, 150, 100, 40),
-      new Blackhole(ctx, 450, 150, 50, 25, 6)
+      new Blackhole(ctx, 300, 400, 100, 75, 15),
+      new Blackhole(ctx, 600, 400, 100, 75, 15),
     ];
-    this.target = new Target(ctx, 950, 50, 50);
+    this.asteroids = [
+      new Asteroid(ctx, 500, 600, 100)
+    ];
+    this.target = new Target(ctx, 950, 700, 50);
   }
   
   level3(ctx) {
     this.blackholes = [
-      new Blackhole(ctx, 400, 500, 100, 75, 15),
-      new Blackhole(ctx, 100, 220, 70, 35, 8),
-      new Blackhole(ctx, 700, 300, 75, 60, 15),
-      new Blackhole(ctx, 750, 600, 150, 100, 40),
-      new Blackhole(ctx, 450, 150, 50, 25, 6)
+      // new Blackhole(ctx, 450, 350, 300, 150, 100),
+      new Blackhole(ctx, 250, 350, 50, 50, 50),
     ];
-    this.target = new Target(ctx, 950, 50, 50);
+    this.asteroids = [
+      new Asteroid(ctx, -50, 500, 70)
+    ];
+    this.target = new Target(ctx, 50, 400, 50);
   }
-
+  
   level4(ctx) {
     this.blackholes = [
-      new Blackhole(ctx, 400, 500, 100, 75, 15),
-      new Blackhole(ctx, 100, 220, 70, 35, 8),
-      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 400, 500, 100, 75, 30),
+      new Blackhole(ctx, 100, 220, 70, 35, 16),
+      new Blackhole(ctx, 700, 300, 75, 60, 25),
       new Blackhole(ctx, 750, 600, 150, 100, 40),
-      new Blackhole(ctx, 450, 150, 50, 25, 6)
+      new Blackhole(ctx, 450, 150, 50, 25, 15)
     ];
+     this.asteroids = [
+       new Asteroid(ctx, 400, 200, 70),
+       new Asteroid(ctx, 600, 400, 30),
+       new Asteroid(ctx, 800, 200, 50),
+     ];
     this.target = new Target(ctx, 950, 50, 50);
   }
 
-  level5(ctx) {
+  level0(ctx) {
     this.blackholes = [
-      new Blackhole(ctx, 400, 500, 100, 75, 15),
-      new Blackhole(ctx, 100, 220, 70, 35, 8),
-      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 400, 500, 100, 75, 30),
+      new Blackhole(ctx, 100, 220, 70, 35, 16),
+      new Blackhole(ctx, 700, 300, 75, 60, 25),
       new Blackhole(ctx, 750, 600, 150, 100, 40),
-      new Blackhole(ctx, 450, 150, 50, 25, 6)
+      new Blackhole(ctx, 450, 150, 50, 25, 15)
     ];
     this.target = new Target(ctx, 950, 50, 50);
   }
