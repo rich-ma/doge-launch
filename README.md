@@ -47,7 +47,7 @@ In this application there will be 4 scripts:
 
 **Day 1**: Ensure webpack is setup correctly, that the page is displaying, and start coding logic for the game.  Goals:
 - [x] Create methods that will allow users to control the velocity of the dogeball.
-- [x] start exploring attraction and gravity and their affects on the dogeball.
+- [x] start exploring attraction and gravity and their affects on the dogeball
 
 **Day 2** Spend this day focusing on getting the gravitation pull(attraction) and rotational forces down so that the dogeball can rotate and be affected by the black holes correctly. Build out the blackhole.js file and connect it to our board.js
 - [x] Complete dogeball.js

@@ -86,6 +86,43 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./lib/asteroid.js":
+/*!*************************!*\
+  !*** ./lib/asteroid.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+class Asteroid {
+  constructor(ctx, x, y, radius) {
+    this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.draw();
+    this.collision = this.collision.bind(this);
+  }
+
+  draw() {
+    const img = new Image();
+    if (this.radius < 10){
+      img.src = './assets/images/asteroid-small.png';
+    } else {
+      img.src = './assets/images/asteroid.png';
+    }
+    this.ctx.drawImage(img, this.x, this.y, this.radius * 2, this.radius * 2);
+  }
+
+  collision(doge){
+    doge.dy *= -1;
+    doge.dx *= -1;
+  }
+}
+
+module.exports = Asteroid;
+
+/***/ }),
+
 /***/ "./lib/blackhole.js":
 /*!**************************!*\
   !*** ./lib/blackhole.js ***!
@@ -101,7 +138,7 @@ class Blackhole {
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.gravity = radius;
+    this.gravity = gravity;
     this.mass = mass;
     this.range = radius * 1.6;
     this.draw();
@@ -150,11 +187,13 @@ const Util = __webpack_require__(/*! ./util.js */ "./lib/util.js");
 document.addEventListener("DOMContentLoaded", () => {
 
     const canvas = document.querySelector('canvas');
+    const restart = document.getElementById('restart');
+    const retry = document.getElementById('retry');
     canvas.width = 1000;
     canvas.height = 800;
     const ctx = canvas.getContext("2d");
     const doge = new Doge(ctx);
-
+    
     addEventListener('mousedown', event => {
         const distance = Util.distance(event.offsetX, event.offsetY, doge.x, doge.y + 50);
         if (distance < 100) {
@@ -163,7 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     addEventListener('mousemove', event => {
         if(doge.clicked){
-            debugger
             doge.lineX = event.offsetX;
             doge.lineY = event.offsetY;
         }
@@ -172,8 +210,16 @@ document.addEventListener("DOMContentLoaded", () => {
         doge.clicked = false; 
         if(doge.lineX && doge.lineY) doge.shoot();            
     });
-
+    
     let game = new Game(doge, ctx);
+    
+    retry.addEventListener('click', () => {
+        game.retry();
+    });
+
+    restart.addEventListener('click', () => {
+        game.restart();
+    });
 });
 
 const colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']
@@ -208,7 +254,7 @@ class Dogeball {
     this.dir = null;
 
     this.shoot = this.shoot.bind(this);
-     
+    this.reset = this.reset.bind(this);
   }
 
   win(){
@@ -239,14 +285,21 @@ class Dogeball {
   updatePos(){
     this.y -= this.dy;
     this.x -= this.dx;
+    console.log(this.x, this.y);
    }
 
   shoot(){
-    this.velocity = Util.distance(50, 750, this.lineX, this.lineY)/20;
+    this.velocity = Util.distance(50, 750, this.lineX, this.lineY);
     this.dy = (750 - this.lineY)/100;
     this.dx = (50 - this.lineX)/100;
-    console.log(this.dy, this.dx)
     this.angle = Util.angle360([50, 750], [this.lineX, this.lineY]);
+  }
+
+  reset(){
+    this.x = 15;
+    this.y = 700;
+    this.dy = 0;
+    this.dx = 0;
   }
 
 
@@ -265,39 +318,67 @@ module.exports = Dogeball;
 
 const Util = __webpack_require__(/*! ./util */ "./lib/util.js");
 const Blackhole = __webpack_require__(/*! ./blackhole */ "./lib/blackhole.js");
+const Asteroid = __webpack_require__(/*! ./asteroid */ "./lib/asteroid.js");
 const Target = __webpack_require__(/*! ./target */ "./lib/target.js");
+
 
 class Game {
   constructor(doge, ctx){
     this.level = 0;
+    this.deaths = 0;
     this.doge = doge;
     this.ctx = ctx;
     this.win = false;
-    this.blackholes = [
-      new Blackhole(ctx, 400, 500, 100, 75, 15),
-      new Blackhole(ctx, 100, 220, 70, 35, 8),
-      new Blackhole(ctx, 700, 300, 75, 60, 15),
-      new Blackhole(ctx, 750, 600, 150, 100, 40),
-      new Blackhole(ctx, 450, 150, 50, 25, 6)
-    ];
-    this.bumpers = [];
-    this.target = new Target(ctx, 950, 0, 50);
+    this.lose = false;
+    this.blackholes = null;
+    this.target = null;
+    this.asteroids = [];
     this.animate = this.animate.bind(this);
     this.checkAttraction = this.checkAttraction.bind(this);
+    this.checkCollision = this.checkCollision.bind(this);
     this.updateDoge = this.updateDoge.bind(this);
     this.checkWin = this.checkWin.bind(this);
+    this.checkLose = this.checkLose.bind(this);
+    this.restart = this.restart.bind(this);
+    this.retry = this.retry.bind(this);
+    this.level1 = this.level1.bind(this);
     window.requestAnimationFrame(this.animate);
   }
 
+  checkLose(){
+    if (this.lose === true) return null;
+    if(this.doge.x > 1050 || this.doge.y > 850 || this.doge.x < -100 || this.doge.y < -200) {
+      this.deaths += 1;
+      this.lose = true;
+      alert('you lost');
+      this.doge.reset();
+    };
+  }
+
+  restart(){
+    this.level = 0;
+    this.deaths = 0;
+    this.lose = false;
+    this.doge.reset();
+  }
+
+  retry(){
+    this.lose = false;
+    this.doge.reset();
+  }
+
   animate(){
-    console.log(this.doge.lineX, this.doge.lineY);
+    if(this.level <= 5) this.changeLevel(this.ctx);
     this.ctx.clearRect(0,0, 1000, 800);
     this.target.draw();
     this.blackholes.forEach(blackhole => blackhole.draw());
+    this.asteroids.forEach(asteroid => asteroid.draw());
     this.checkWin();
     this.updateDoge();
     this.checkAttraction();
+    this.checkCollision();
     window.requestAnimationFrame(this.animate);
+    this.checkLose();
   }
 
   updateDoge(){
@@ -306,11 +387,12 @@ class Game {
   }
 
   checkWin(){
-    const distance = Util.distance(this.doge.x, this.doge.y, this.target.x, this.target.y);
-    if (distance < this.target.size && !this.win){
-      this.win = true;
-      this.doge.win();
-      alert("win!");
+    const distance = Util.distance(this.doge.x, this.doge.y, this.target.x-this.target.size/2, this.target.y-this.target.size/2);
+    if (distance < this.target.size){
+      this.doge.win(); 
+      alert(`Wow such win! Click to go to level ${this.level + 1}!\n\nYou have died ${this.deaths} ${this.deaths === 1 ? 'time' : 'times'}.`);
+      this.doge.reset();
+      this.level += 1;
     }
   }
 
@@ -321,6 +403,82 @@ class Game {
         blackhole.applyGravity(this.doge, distance);
       }
     })
+  }
+
+  checkCollision(){
+    this.asteroids.forEach(asteroid => {
+      const distance = Util.distance(this.doge.x, this.doge.y, asteroid.x, asteroid.y);
+      if (distance <= asteroid.radius){
+        asteroid.collision(this.doge);
+      }
+    })
+  }
+
+  changeLevel(ctx){
+    if (this.level === 0) this.level0(ctx);
+    if (this.level === 1) this.level1(ctx);
+    if (this.level === 2) this.level2(ctx);
+    if (this.level === 3) this.level3(ctx);
+    if (this.level === 4) this.level4(ctx);
+    if (this.level === 5) this.level5(ctx);
+  }
+
+  level0(ctx){
+    this.blackholes = [];
+    this.asteroids = [
+    ];
+    this.target = new Target(ctx, 450, 350, 50);
+  }
+  level1(ctx){
+    this.blackholes = [new Blackhole(ctx, 200, 350, 50, 50, 50)];
+    this.asteroids = [
+      new Asteroid(ctx, 500, 350, 50)
+    ];
+    this.target = new Target(ctx, 950, 50, 50);
+  }
+
+  level2(ctx) {
+    this.blackholes = [
+      new Blackhole(ctx, 400, 500, 100, 75, 15),
+      new Blackhole(ctx, 100, 220, 70, 35, 8),
+      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 750, 600, 150, 100, 40),
+      new Blackhole(ctx, 450, 150, 50, 25, 6)
+    ];
+    this.target = new Target(ctx, 950, 50, 50);
+  }
+  
+  level3(ctx) {
+    this.blackholes = [
+      new Blackhole(ctx, 400, 500, 100, 75, 15),
+      new Blackhole(ctx, 100, 220, 70, 35, 8),
+      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 750, 600, 150, 100, 40),
+      new Blackhole(ctx, 450, 150, 50, 25, 6)
+    ];
+    this.target = new Target(ctx, 950, 50, 50);
+  }
+
+  level4(ctx) {
+    this.blackholes = [
+      new Blackhole(ctx, 400, 500, 100, 75, 15),
+      new Blackhole(ctx, 100, 220, 70, 35, 8),
+      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 750, 600, 150, 100, 40),
+      new Blackhole(ctx, 450, 150, 50, 25, 6)
+    ];
+    this.target = new Target(ctx, 950, 50, 50);
+  }
+
+  level5(ctx) {
+    this.blackholes = [
+      new Blackhole(ctx, 400, 500, 100, 75, 15),
+      new Blackhole(ctx, 100, 220, 70, 35, 8),
+      new Blackhole(ctx, 700, 300, 75, 60, 15),
+      new Blackhole(ctx, 750, 600, 150, 100, 40),
+      new Blackhole(ctx, 450, 150, 50, 25, 6)
+    ];
+    this.target = new Target(ctx, 950, 50, 50);
   }
 }
 

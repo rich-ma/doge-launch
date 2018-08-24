@@ -1,3 +1,59 @@
+/* PHASE 0: Reset */
+
+html,body,header,nav,h1,a,ul,li,
+strong,main,button,i,section,img,div,h2,p,form,fieldset,label,input,textarea,span,article,footer,time,small {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  text-decoration: inherit;
+  vertical-align: inherit;
+  box-sizing: inherit;
+  background: transparent;
+  font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+input[type="password"],
+input[type="email"],
+input[type="text"],
+input[type="submit"],
+textarea,
+button {
+  /*
+  Get rid of native styling. Read more here:
+  http://css-tricks.com/almanac/properties/a/appearance/
+  */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+button,
+input[type="submit"] {
+  cursor: pointer;
+}
+
+/* Clearfix */
+
+.group:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
 #board {
   background-image: url('../images/background.jpg');
   width: 1000px;
@@ -12,6 +68,7 @@ header{
   height: 50px;
   justify-content: space-between;
   background-color: black;
+  border-bottom: 3px solid #23272A;
   
 }
 header > div {
@@ -21,16 +78,18 @@ header > div {
   align-items: center;
   color: #fff;
   font-size: 24px;
+  font-family: 'Fugaz One', cursive;
+
 }
 
 body {
   display: flex;
   flex-direction: column;
-  background-color: #23272A;
+  background-color: black;
   align-items: center;
 }
 
-ul{
+header > ul{
   list-style: none;
   display: flex;
   flex-direction: row;
@@ -47,3 +106,29 @@ ul{
   margin-right: 10px;
 }
 
+.controls {
+  font-size: 24px;
+  color: #99AAB5;
+  display: flex;
+  flex-direction: row;
+  width: 1000px;
+  justify-content: space-between;
+  align-content: center;
+}
+
+.controls-left{
+  font-size: 24px;
+  padding: 0;
+}
+
+#retry:hover{
+  color: #fff;
+}
+
+#restart:hover{
+  color: #fff;
+}
+
+#help:hover{
+  color: #fff;
+}

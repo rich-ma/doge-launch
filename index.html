@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="./assets/stylesheets/game.css" type="text/css">  
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
   crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Fugaz+One" rel="stylesheet">
 
 </head>
 <body>
@@ -22,7 +23,6 @@
     <i class="fas fa-paw"></i>
     <h3>Doge Launch</h3>
   </div> 
-
   <ul>
     <li>
       <a target="_blank" href="https://github.com/rich-ma">
@@ -36,6 +36,14 @@
     </li>
   </ul>
 </header>
+<div class='controls'>
+  <ul class='controls-left'>
+    <i id='retry' class="fas fa-undo"></i>
+    <i id='restart' class="fas fa-fast-backward"></i>
+  </ul>
+  <i id='help' class="far fa-question-circle"></i>
+</div>
+
     <canvas id='board'></canvas>
     <script type="text/javascript" src="./bundle.js"></script>
 </body>
