@@ -471,6 +471,7 @@ class Game {
     const winModal = document.getElementById("win");
     const deathCount = document.getElementById("death-count");
     if(this.win){
+      debugger
     this.ctx.clearRect(0, 0, 1000, 800);
     this.updateDoge(this.win, this.gravity);
     this.drawComponents();
@@ -513,7 +514,7 @@ class Game {
     if (this.level === 5) this.level5(ctx);
   }
 
-  level5(ctx){
+  level0(ctx){
     this.blackholes = [];
     this.asteroids = [
     ];
@@ -565,7 +566,7 @@ class Game {
     this.target = new Target(ctx, 950, 50, 50);
   }
 
-  level0(ctx) {
+  level5(ctx) {
     this.blackholes = [
       new Blackhole(ctx, 400, 500, 100, 75, 30),
       new Blackhole(ctx, 100, 220, 70, 35, 16),
